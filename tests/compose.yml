@@ -1,0 +1,9 @@
+services:
+
+  service1:
+    image: busybox
+    command: sh -c 'echo "Service 1 running" && sleep infinity'
+
+  service2:
+    image: busybox
+    command: sh -c 'echo "Service 2 running" && sleep infinity'

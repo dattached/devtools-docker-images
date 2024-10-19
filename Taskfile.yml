@@ -1,0 +1,63 @@
+version: '3'
+
+vars:
+  ORG: dattached
+  NAME: dattached/lazydocker
+  LAZYDOCKER_VERSION: {sh: sed -ne 's/ARG LAZYDOCKER_VERSION=\(.*\)/\1/p' Dockerfile}
+  LAZYDOCKER_MINOR_VERSION: '{{join "." (slice (splitList "." .LAZYDOCKER_VERSION) 0 2)}}'
+  LOCAL: .local
+
+env:
+  DOCKER_CONFIG: '{{.LOCAL}}/docker'
+
+tasks:
+
+  term:
+    desc: Run dev terminal.
+    cmds:
+      - sh -c 'alacritty --hold --working-directory {{.ROOT_DIR}} -T {{base .ROOT_DIR}} &'
+
+  login:
+    internal: true
+    status:
+      - test -d ${DOCKER_CONFIG}
+    cmds:
+      - mkdir -p ${DOCKER_CONFIG}
+      - docker -c default login -u {{.ORG}}
+
+  logout:
+    internal: true
+    cmds:
+      - docker logout
+
+  build:
+    desc: Build docker image.
+    deps: [login]
+    cmds:
+      - docker build
+          --tag {{.NAME}}:{{.LAZYDOCKER_VERSION}}
+          --tag {{.NAME}}:{{.LAZYDOCKER_MINOR_VERSION}}
+          --tag {{.NAME}}:latest
+          .
+
+  testrun:
+    desc: Run newly built image.
+    cmds:
+      - docker compose -f tests/compose.yml up --detach
+      - defer: docker compose -f tests/compose.yml down
+      - docker run --rm -it --name lazydocker
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v ./tests/compose.yml:/compose.yml
+          {{.NAME}}:{{.LAZYDOCKER_VERSION}}
+
+  publish:
+    desc: Publish newly built image.
+    deps: [build]
+    cmds:
+      - docker push --all-tags "{{.NAME}}"
+
+  clean:
+    desc: Cleanup local files.
+    cmds:
+      - task: logout
+      - rm -rf {{.LOCAL}}

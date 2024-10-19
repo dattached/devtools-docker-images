@@ -1,0 +1,6 @@
+gui:
+  containerStatusHealthStyle: icon
+  language: en
+ignore:
+  - k8s_
+  - lazydocker
