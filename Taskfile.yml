@@ -2,20 +2,19 @@ version: '3'
 
 vars:
   ORG: dattached
-  NAME: dattached/lazydocker
-  LAZYDOCKER_VERSION: {sh: sed -ne 's/ARG LAZYDOCKER_VERSION=\(.*\)/\1/p' Dockerfile}
-  LAZYDOCKER_MINOR_VERSION: '{{join "." (slice (splitList "." .LAZYDOCKER_VERSION) 0 2)}}'
   LOCAL: .local
+  # versions
+  LAZYDOCKER_VERSION: {sh: sed -ne 's/ARG LAZYDOCKER_VERSION=\(.*\)/\1/p' lazydocker/Dockerfile}
+  USQL_VERSION: {sh: sed -ne 's/ARG USQL_VERSION=\(.*\)/\1/p' usql/Dockerfile}
+  VERSIONS:
+    ref: dict
+      "lazydocker" .LAZYDOCKER_VERSION
+      "usql" .USQL_VERSION
 
 env:
   DOCKER_CONFIG: '{{.LOCAL}}/docker'
 
 tasks:
-
-  term:
-    desc: Run dev terminal.
-    cmds:
-      - sh -c 'alacritty --hold --working-directory {{.ROOT_DIR}} -T {{base .ROOT_DIR}} &'
 
   login:
     internal: true
@@ -30,34 +29,47 @@ tasks:
     cmds:
       - docker logout
 
-  build:
-    desc: Build docker image.
+  build:*:
+    desc: Build dattached/* docker image.
     deps: [login]
+    vars:
+      TOOL: '{{index .MATCH 0}}'
+      VERSION: '{{get .VERSIONS .TOOL}}'
+      VERSION_MINOR: '{{join "." (slice (splitList "." .VERSION) 0 2)}}'
     cmds:
       - docker build
-          --tag {{.NAME}}:{{.LAZYDOCKER_VERSION}}
-          --tag {{.NAME}}:{{.LAZYDOCKER_MINOR_VERSION}}
-          --tag {{.NAME}}:latest
-          .
+          --tag {{.ORG}}/{{.TOOL}}:{{.VERSION}}
+          --tag {{.ORG}}/{{.TOOL}}:{{.VERSION_MINOR}}
+          --tag {{.ORG}}/{{.TOOL}}:latest
+          {{.TOOL}}
 
-  testrun:
-    desc: Run newly built image.
+  testrun:*:
+    desc: Run newly built dattached/* image.
+    vars:
+      TOOL: '{{index .MATCH 0}}'
+    env:
+      COMPOSE_FILE: '{{.TOOL}}/test/compose.yml'
     cmds:
-      - docker compose -f tests/compose.yml up --detach
-      - defer: docker compose -f tests/compose.yml down
-      - docker run --rm -it --name lazydocker
-          -v /var/run/docker.sock:/var/run/docker.sock
-          -v ./tests/compose.yml:/compose.yml
-          {{.NAME}}:{{.LAZYDOCKER_VERSION}}
+      - docker compose run --rm {{.TOOL}}
+      - defer: docker compose down
 
-  publish:
-    desc: Publish newly built image.
-    deps: [build]
+  publish:*:
+    desc: Publish newly built dattached/* image.
+    deps: ['build:{{.TOOL}}']
+    vars:
+      TOOL: '{{index .MATCH 0}}'
     cmds:
-      - docker push --all-tags "{{.NAME}}"
+      - docker push --all-tags "{{.ORG}}/{{.TOOL}}"
 
   clean:
     desc: Cleanup local files.
     cmds:
       - task: logout
       - rm -rf {{.LOCAL}}
+
+  # helpers
+
+  term:
+    desc: Run dev terminal.
+    cmds:
+      - sh -c 'alacritty --hold --working-directory {{.ROOT_DIR}} -T {{base .ROOT_DIR}} &'

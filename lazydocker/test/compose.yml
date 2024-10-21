@@ -1,0 +1,20 @@
+services:
+
+  service1:
+    image: busybox
+    command: sh -c 'echo "Service 1 running" && sleep infinity'
+
+  service2:
+    image: busybox
+    command: sh -c 'echo "Service 2 running" && sleep infinity'
+
+  lazydocker:
+    image: dattached/lazydocker:latest
+    container_name: lazydocker
+    depends_on:
+      - service1
+      - service2
+    stdin_open: true
+    tty: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
