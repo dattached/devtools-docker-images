@@ -3,7 +3,10 @@
 * [lazydocker](https://github.com/jesseduffield/lazydocker)
 * [usql](https://github.com/xo/usql)
 
-## lazydocker
+# lazydocker
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/lazydocker)](https://hub.docker.com/repositories/dattached/lazydocker)
+
 
 Image for [lazydocker](https://github.com/jesseduffield/lazydocker) terminal UI.
 
@@ -20,7 +23,10 @@ services:
       #- ./config.yml:/root/.config/lazydocker/config.yml:ro
 ```
 
-## usql
+# usql
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/usql)](https://hub.docker.com/repositories/dattached/usql)
+
 
 Image for [usql](https://github.com/xo/usql) SQL console with [pspg](https://github.com/okbob/pspg) table pager.
 
