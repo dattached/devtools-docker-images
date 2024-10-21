@@ -20,7 +20,11 @@ RUN wget -q https://github.com/okbob/pspg/archive/refs/tags/${PSPG_VERSION}.tar.
 
 FROM docker.io/usql/usql:${USQL_VERSION}
 RUN apt update; \
-    apt install -y gettext-base; \
+    apt install -y gettext-base libncursesw6; \
     apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+COPY --from=build-pspg /tmp/build/pspg /bin/pspg
+COPY ./config.pspg.ini /root/.config/pspg/config.ini
+ENV PAGER=/bin/pspg \
+    PSPG_CONF=/root/.config/pspg/config.ini
 COPY --chmod=755 ./entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]

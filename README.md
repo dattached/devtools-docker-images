@@ -22,7 +22,7 @@ services:
 
 ## usql
 
-Image for [usql](https://github.com/xo/usql) SQL console (todo: with [pspg](https://github.com/okbob/pspg) table pager).
+Image for [usql](https://github.com/xo/usql) SQL console with [pspg](https://github.com/okbob/pspg) table pager.
 
 ### Use `usql` as Docker Compose service
 

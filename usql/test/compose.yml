@@ -49,7 +49,7 @@ services:
 configs:
   postgres_db: {content: postgres-test}
   postgres_user: {content: postgres-test}
-  usql_config: {file: config.yaml}
+  usql_config: {file: config.usql.yaml }
 
 secrets:
   postgres_password: {environment: POSTGRES_PASSWORD}
