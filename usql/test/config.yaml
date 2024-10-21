@@ -1,0 +1,2 @@
+connections:
+  postgres: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}

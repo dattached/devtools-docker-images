@@ -1,34 +1,3 @@
-# Docker images for dev tools
-
-* [lazydocker](https://github.com/jesseduffield/lazydocker)
-* [usql](https://github.com/xo/usql)
-
-## lazydocker
-
-Image for [lazydocker](https://github.com/jesseduffield/lazydocker) terminal UI.
-
-### Docker Compose
-
-```yaml
-services:
-  # ...
-  lazydocker:
-    image: dattached/lazydocker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      #- ./compose.yml:/compose.yml:ro
-      #- ./config.yml:/root/.config/lazydocker/config.yml:ro
-```
-
-## usql
-
-Image for [usql](https://github.com/xo/usql) SQL console (todo: with [pspg](https://github.com/okbob/pspg) table pager).
-
-### Use `usql` as Docker Compose service
-
-```yaml
-# compose.yml
-
 services:
 
   postgres:
@@ -87,30 +56,3 @@ secrets:
 
 volumes:
   postgres_data:
-```
-
-```yaml
-# config.yaml
-
-connections:
-  postgres: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-```
-
-```shell
-# .env
-
-export POSTGRES_PASSWORD=secret
-```
-
-## Development
-
-Install [Task](https://taskfile.dev).
-
-For each `TOOL` in `lazydocker`, `usql` etc.:
-
-```shell
-$ task build:TOOL
-$ task testrun:TOOL
-$ task publish:TOOL
-$ task clean
-```
