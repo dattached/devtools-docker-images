@@ -5,7 +5,7 @@
 
 # lazydocker
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/lazydocker)](https://hub.docker.com/repositories/dattached/lazydocker)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/lazydocker)](https://hub.docker.com/r/dattached/lazydocker)
 
 
 Image for [lazydocker](https://github.com/jesseduffield/lazydocker) terminal UI.
@@ -25,7 +25,7 @@ services:
 
 # usql
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/usql)](https://hub.docker.com/repositories/dattached/usql)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/usql)](https://hub.docker.com/r/dattached/usql)
 
 
 Image for [usql](https://github.com/xo/usql) SQL console with [pspg](https://github.com/okbob/pspg) table pager.
