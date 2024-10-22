@@ -23,20 +23,20 @@ main() {
 
   # update apt cache
   if [ ${FLAGS_aptupdate} -eq ${FLAGS_TRUE} ]; then
-    apt update;
+    apt-get update;
   fi
 
   # install download helpers
-  apt install -y curl wget
+  apt-get install -y curl wget
 
   # install stream editors
-  apt install -y jq
+  apt-get install -y jq
 
   # install git
-  apt install -y git
+  apt-get install -y git
 
   # install zsh and friends
-  apt install -y lsd zsh
+  apt-get install -y lsd zsh
   wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | RUNZSH=no CHSH=yes sh
 
   # install task
@@ -46,7 +46,7 @@ main() {
   fi
   TASK_URL="https://github.com/go-task/task/releases/download/${TASK_RELEASE}/task_linux_amd64.deb"
   wget -q ${TASK_URL} -P /tmp
-  apt install -y /tmp/task_linux_amd64.deb
+  apt-get install -y /tmp/task_linux_amd64.deb
 
   # cleanup
   if [ ${FLAGS_aptclean} -eq ${FLAGS_TRUE} ]; then

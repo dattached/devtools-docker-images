@@ -23,11 +23,11 @@ main() {
 
   # update apt cache
   if [ ${FLAGS_aptupdate} -eq ${FLAGS_TRUE} ]; then
-    apt update;
+    apt-get update;
   fi
 
   # add postgresql repository
-  apt install -y postgresql-common
+  apt-get install -y postgresql-common
   YES=true /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
 
   # cleanup
