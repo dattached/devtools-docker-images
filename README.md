@@ -107,7 +107,7 @@ connections:
 export POSTGRES_PASSWORD=secret
 ```
 
-## Development
+# Development
 
 Install [Task](https://taskfile.dev).
 
