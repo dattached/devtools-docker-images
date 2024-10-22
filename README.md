@@ -1,12 +1,13 @@
 # Docker images for dev tools
 
-* [lazydocker](https://github.com/jesseduffield/lazydocker)
-* [usql](https://github.com/xo/usql)
+* [lazydocker](https://github.com/jesseduffield/lazydocker) —
+A simple terminal UI for both docker and docker-compose
+
+* [usql](https://github.com/xo/usql) — Universal command-line interface for SQL databases. Includes [pspg](https://github.com/okbob/pspg), Unix pager designed for work with tables
 
 # lazydocker
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/dattached/lazydocker)](https://hub.docker.com/r/dattached/lazydocker)
-
 
 Image for [lazydocker](https://github.com/jesseduffield/lazydocker) terminal UI.
 
@@ -110,11 +111,10 @@ export POSTGRES_PASSWORD=secret
 
 Install [Task](https://taskfile.dev).
 
-For each `TOOL` in `lazydocker`, `usql` etc.:
-
 ```shell
-$ task build:TOOL
-$ task testrun:TOOL
-$ task publish:TOOL
+# IMG is one of: lazydocker, usql
+$ task build:IMG
+$ task testrun:IMG
+$ task publish:IMG
 $ task clean
 ```
