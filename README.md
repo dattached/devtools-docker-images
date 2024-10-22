@@ -1,9 +1,29 @@
 # Docker images for dev tools
 
+* bootstrap — Shell scripts to use in Dockerfiles.
 * [lazydocker](https://github.com/jesseduffield/lazydocker) —
-A simple terminal UI for both docker and docker-compose
+A simple terminal UI for both docker and docker-compose.
 
-* [usql](https://github.com/xo/usql) — Universal command-line interface for SQL databases. Includes [pspg](https://github.com/okbob/pspg), Unix pager designed for work with tables
+* [usql](https://github.com/xo/usql) — Universal command-line interface for SQL databases. Includes [pspg](https://github.com/okbob/pspg), Unix pager designed for work with tables.
+
+
+# bootstrap
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/dattached/bootstrap)](https://hub.docker.com/r/dattached/bootstrap)
+
+Managed collection of shell scripts to use in Dockerfiles:
+
+* [debian-install-devtools.sh]() — Install [Git](https://git-scm.com), [Task](https://taskfile.dev), [Oh My Zsh!](https://ohmyz.sh), [LSD](https://github.com/lsd-rs/lsd).
+
+Example:
+
+```Dockerfile
+# Dockerfile
+
+RUN --mount=type=bind,from=dattached/bootstrap:latest,dst=/bootstrap \
+    bash /bootstrap/debian-install-devtools.sh
+```
+
 
 # lazydocker
 
@@ -11,9 +31,11 @@ A simple terminal UI for both docker and docker-compose
 
 Image for [lazydocker](https://github.com/jesseduffield/lazydocker) terminal UI.
 
-### Docker Compose
+Example:
 
 ```yaml
+# compose.yml
+
 services:
   # ...
   lazydocker:
@@ -24,14 +46,14 @@ services:
       #- ./config.yml:/root/.config/lazydocker/config.yml:ro
 ```
 
+
 # usql
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/dattached/usql)](https://hub.docker.com/r/dattached/usql)
 
-
 Image for [usql](https://github.com/xo/usql) SQL console with [pspg](https://github.com/okbob/pspg) table pager.
 
-### Use `usql` as Docker Compose service
+Example:
 
 ```yaml
 # compose.yml

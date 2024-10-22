@@ -1,0 +1,12 @@
+services:
+
+  bootstrap:
+    image: busybox
+    depends_on:
+      debian-install-devtools: {condition: service_completed_successfully}
+
+  debian-install-devtools:
+    image: debian:12.7-slim
+    command: /bin/bash /bootstrap/scripts/debian-install-devtools.sh
+    volumes:
+      - ../scripts:/bootstrap/scripts:ro

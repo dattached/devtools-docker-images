@@ -4,10 +4,12 @@ vars:
   ORG: dattached
   LOCAL: .local
   # versions
+  BOOTSTRAP_VERSION: {sh: sed -ne 's/ARG VERSION=\(.*\)/\1/p' bootstrap/Dockerfile}
   LAZYDOCKER_VERSION: {sh: sed -ne 's/ARG LAZYDOCKER_VERSION=\(.*\)/\1/p' lazydocker/Dockerfile}
   USQL_VERSION: {sh: sed -ne 's/ARG USQL_VERSION=\(.*\)/\1/p' usql/Dockerfile}
   VERSIONS:
     ref: dict
+      "bootstrap" .BOOTSTRAP_VERSION
       "lazydocker" .LAZYDOCKER_VERSION
       "usql" .USQL_VERSION
 
@@ -50,7 +52,7 @@ tasks:
     env:
       COMPOSE_FILE: '{{.TOOL}}/test/compose.yml'
     cmds:
-      - docker compose run --rm {{.TOOL}}
+      - docker compose up --always-recreate-deps --force-recreate {{.TOOL}}
       - defer: docker compose down
 
   publish:*:
