@@ -18,6 +18,8 @@ env:
 
 tasks:
 
+  # docker
+
   login:
     internal: true
     status:
@@ -31,37 +33,76 @@ tasks:
     cmds:
       - docker logout
 
+  # prepare
+
+  prepare:*:
+    desc: Prepare dattached/* local prerequisites.
+    vars:
+      IMG: '{{index .MATCH 0}}'
+    cmds:
+      - task: prepare:{{.IMG}}:all
+
+  prepare:bootstrap:all:
+    cmds:
+      - task: prepare:botstrap:util:shflags
+
+  prepare:botstrap:util:shflags:
+    vars:
+      SHFLAGS_VERSION: 1.3.0  # todo: check latest version
+      SHFLAGS_URL: https://raw.githubusercontent.com/kward/shflags/v{{.SHFLAGS_VERSION}}/shflags
+      SHFLAGS_PATH: bootstrap/scripts/lib/shflags
+    status:
+      - test -f {{.SHFLAGS_PATH}}
+      - grep -Fxq "FLAGS_VERSION='{{.SHFLAGS_VERSION}}'" {{.SHFLAGS_PATH}}
+    cmds:
+      - wget -q -O {{.SHFLAGS_PATH}} {{.SHFLAGS_URL}}
+
+  prepare:lazydocker:all:
+    status: [/bin/true]  # todo: check latest versions in Dockerfile
+
+  prepare:usql:all:
+    status: [/bin/true]  # todo: check latest versions in Dockerfile
+
+  # build
+
   build:*:
     desc: Build dattached/* docker image.
-    deps: [login]
+    deps: [login, 'prepare:{{.IMG}}']
     vars:
-      TOOL: '{{index .MATCH 0}}'
-      VERSION: '{{get .VERSIONS .TOOL}}'
+      IMG: '{{index .MATCH 0}}'
+      VERSION: '{{get .VERSIONS .IMG}}'
       VERSION_MINOR: '{{join "." (slice (splitList "." .VERSION) 0 2)}}'
     cmds:
       - docker build
-          --tag {{.ORG}}/{{.TOOL}}:{{.VERSION}}
-          --tag {{.ORG}}/{{.TOOL}}:{{.VERSION_MINOR}}
-          --tag {{.ORG}}/{{.TOOL}}:latest
-          {{.TOOL}}
+          --tag {{.ORG}}/{{.IMG}}:{{.VERSION}}
+          --tag {{.ORG}}/{{.IMG}}:{{.VERSION_MINOR}}
+          --tag {{.ORG}}/{{.IMG}}:latest
+          {{.IMG}}
+
+  # test run
 
   testrun:*:
     desc: Run newly built dattached/* image.
     vars:
-      TOOL: '{{index .MATCH 0}}'
+      IMG: '{{index .MATCH 0}}'
     env:
-      COMPOSE_FILE: '{{.TOOL}}/test/compose.yml'
+      COMPOSE_FILE: '{{.IMG}}/test/compose.yml'
     cmds:
-      - docker compose up --always-recreate-deps --force-recreate {{.TOOL}}
+      - docker compose down  # handle previous failures
+      - docker compose up {{.IMG}}
       - defer: docker compose down
+
+  # publish
 
   publish:*:
     desc: Publish newly built dattached/* image.
-    deps: ['build:{{.TOOL}}']
+    deps: ['build:{{.IMG}}']
     vars:
-      TOOL: '{{index .MATCH 0}}'
+      IMG: '{{index .MATCH 0}}'
     cmds:
-      - docker push --all-tags "{{.ORG}}/{{.TOOL}}"
+      - docker push --all-tags "{{.ORG}}/{{.IMG}}"
+
+  # clean
 
   clean:
     desc: Cleanup local files.

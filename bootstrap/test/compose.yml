@@ -2,11 +2,19 @@ services:
 
   bootstrap:
     image: busybox
+    command: echo "All tests passed."
     depends_on:
-      debian-install-devtools: {condition: service_completed_successfully}
+      debian-add-apt-postgresql: {condition: service_completed_successfully}
+      debian-apt-install-devtools: {condition: service_completed_successfully}
 
-  debian-install-devtools:
+  debian-add-apt-postgresql:
     image: debian:12.7-slim
-    command: /bin/bash /bootstrap/scripts/debian-install-devtools.sh
+    command: /bin/bash /bootstrap/scripts/debian-add-apt-postgresql.sh
+    volumes:
+      - ../scripts:/bootstrap/scripts:ro
+
+  debian-apt-install-devtools:
+    image: debian:12.7-slim
+    command: /bin/bash /bootstrap/scripts/debian-apt-install-devtools.sh
     volumes:
       - ../scripts:/bootstrap/scripts:ro
