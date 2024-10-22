@@ -39,8 +39,6 @@ services:
 
   postgres:
     image: postgres:17-bookworm
-    stdin_open: true
-    tty: true
     healthcheck:
       test: pg_isready -t3 -h127.0.0.1
       interval: 30s
