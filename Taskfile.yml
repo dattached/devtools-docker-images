@@ -44,9 +44,22 @@ tasks:
 
   prepare:bootstrap:all:
     cmds:
-      - task: prepare:botstrap:util:shflags
+      - task: prepare:bootstrap:docs
+      - task: prepare:bootstrap:util:shflags
 
-  prepare:botstrap:util:shflags:
+  prepare:bootstrap:docs:
+    sources: [bootstrap/scripts/*.sh]
+    generates: [bootstrap.md]
+    cmds:
+      - echo "# Bootstrap scripts" > bootstrap.md
+      - cmd: >
+          echo -e '\n## {{base .ITEM}}\n```' >> bootstrap.md;
+          bash {{.ITEM}} --help >> bootstrap.md 2>&1 || true;
+          echo '```' >> bootstrap.md;
+        for: sources
+        silent: true
+
+  prepare:bootstrap:util:shflags:
     vars:
       SHFLAGS_VERSION: 1.3.0  # todo: check latest version
       SHFLAGS_URL: https://raw.githubusercontent.com/kward/shflags/v{{.SHFLAGS_VERSION}}/shflags
