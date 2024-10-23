@@ -14,7 +14,6 @@ A simple terminal UI for both docker and docker-compose.
 Managed collection of shell scripts to use in Dockerfiles:
 
 * [debian-add-apt-postgresql.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap.md#debian-add-apt-postgresqlsh) — Add APT repository with latest PostgreSQL packages.
-* [debian-apt-install.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap.md#debian-apt-installsh) — Install arbitrary APT packages.
 * [debian-apt-install-devtools.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap.md#debian-apt-install-devtoolssh) — Install [Git](https://git-scm.com), [Task](https://taskfile.dev), [Oh My Zsh!](https://ohmyz.sh), [LSD](https://github.com/lsd-rs/lsd).
 
 Example:

@@ -19,13 +19,3 @@ flags:
   --[no]clean:  clean APT cache and temporary files (default: true)
   -h,--help:  show this help (default: false)
 ```
-
-## debian-apt-install.sh
-```
-Install arbitrary packages.
-USAGE: debian-apt-install.sh [-h] [--noupdate] [--noclean] package [package...]
-flags:
-  --[no]update:  update APT cache (default: true)
-  --[no]clean:  clean APT cache and temporary files (default: true)
-  -h,--help:  show this help (default: false)
-```
