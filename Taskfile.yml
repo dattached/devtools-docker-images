@@ -89,7 +89,6 @@ tasks:
       - docker build
           --tag {{.ORG}}/{{.IMG}}:{{.VERSION}}
           --tag {{.ORG}}/{{.IMG}}:{{.VERSION_MINOR}}
-          --tag {{.ORG}}/{{.IMG}}:latest
           {{.IMG}}
 
   # test run
@@ -112,8 +111,11 @@ tasks:
     deps: ['build:{{.IMG}}']
     vars:
       IMG: '{{index .MATCH 0}}'
+      VERSION: '{{get .VERSIONS .IMG}}'
+      VERSION_MINOR: '{{join "." (slice (splitList "." .VERSION) 0 2)}}'
     cmds:
-      - docker push --all-tags "{{.ORG}}/{{.IMG}}"
+      - docker push "{{.ORG}}/{{.IMG}}:{{.VERSION}}"
+      - docker push "{{.ORG}}/{{.IMG}}:{{.VERSION_MINOR}}"
 
   # clean
 
