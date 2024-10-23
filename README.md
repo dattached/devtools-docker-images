@@ -22,8 +22,8 @@ Example:
 ```Dockerfile
 # Dockerfile
 
-RUN --mount=type=bind,from=dattached/bootstrap:latest,dst=/bootstrap \
-    bash /bootstrap/debian-apt-install-devtools.sh
+RUN --mount=type=bind,from=dattached/bootstrap,dst=/b \
+    bash /b/debian-apt-install-devtools.sh
 ```
 
 
