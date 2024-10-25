@@ -108,12 +108,11 @@ tasks:
       IMG: '{{index .MATCH 0}}'
       VERSION:
         sh: hcl2json {{.IMG}}/docker-bake.hcl | jq -r '.variable.version[].default'
-      TARGET: 'dattached/{{.IMG}}:{{.VERSION}}'
     dir: '{{.IMG}}'
     status:
-      - 'docker pull {{.TARGET}}'
+      - 'docker pull dattached/{{.IMG}}:{{.VERSION}}'
     cmds:
-      - git tag -a "{{.TARGET}}" -m "release {{.TARGET}}"
+      - git tag -a "{{.IMG}}-{{.VERSION}}" -m "release dattached/{{.IMG}}:{{.VERSION}}"
       - docker buildx bake release
 
   # clean

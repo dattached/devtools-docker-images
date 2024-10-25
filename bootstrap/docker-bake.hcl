@@ -1,5 +1,5 @@
 variable "name" { default = "bootstrap" }
-variable "version" { default = "1.4.0" }
+variable "version" { default = "1.4.1" }
 
 # building
 
@@ -17,9 +17,9 @@ target "default" {
   ]
 }
 
-# publishing
+# release
 
-target "publish" {
+target "release" {
   inherits = ["default"]
   output = ["type=registry"]
 }

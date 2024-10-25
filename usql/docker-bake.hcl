@@ -20,9 +20,9 @@ target "default" {
   ]
 }
 
-# publishing
+# release
 
-target "publish" {
+target "release" {
   inherits = ["default"]
   output = ["type=registry"]
 }
