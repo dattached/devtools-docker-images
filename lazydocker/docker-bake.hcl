@@ -1,5 +1,5 @@
 variable "name" { default = "lazydocker" }
-variable "version" { default = "0.23.3.1" }  # see Dockerfile LAZYDOCKER_VERSION
+variable "version" { default = "0.23.3.2" }  # see Dockerfile LAZYDOCKER_VERSION
 
 # building
 
