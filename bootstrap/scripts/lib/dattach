@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+
+. "${SCRIPT_LIB}/shflags"
+
+
+script_help() {
+  echo "${SCRIPT_DESC}"
+  echo "USAGE: ${SCRIPT_USAGE}"
+}
+
+script_docs() {
+  echo "## ${SCRIPT_NAME}"
+  echo
+  echo "${SCRIPT_DESC}"
+  if [[ $(type -t SCRIPT_DOCS_TEMPLATE) == function ]]; then
+    echo; SCRIPT_DOCS_TEMPLATE
+  fi
+  echo
+  echo "### Synopsis"
+  echo '```shell'
+  echo "${SCRIPT_USAGE}"
+  echo "$(bash ${SCRIPT_PATH:-${SCRIPT_NAME}} -h 2>&1)" | sed -ne '/^flags:$/,$p'
+  echo '```'
+  echo
+  echo "### Example"
+  echo "\`\`\`${SCRIPT_EXAMPLE_LANG}"
+  echo "${SCRIPT_EXAMPLE}"
+  echo '```'
+}

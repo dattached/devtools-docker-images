@@ -29,6 +29,7 @@ tasks:
       SCRIPT_LIB: 'scripts/lib'
       SCRIPT_SOURCE: true
     cmds:
+      - echo >> {{.DOCS}}
       - . "{{.SCRIPT_PATH}}" && script_docs >> {{.DOCS}}
 
   update:shflags:
