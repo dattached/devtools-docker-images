@@ -13,16 +13,33 @@ A simple terminal UI for both docker and docker-compose.
 
 Managed collection of shell scripts to use in Dockerfiles:
 
-* [debian-add-apt-postgresql.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap.md#debian-add-apt-postgresqlsh) — Add APT repository with latest PostgreSQL packages.
-* [debian-apt-install-devtools.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap.md#debian-apt-install-devtoolssh) — Install [Git](https://git-scm.com), [Task](https://taskfile.dev), [Oh My Zsh!](https://ohmyz.sh), [LSD](https://github.com/lsd-rs/lsd).
+* [debian-add-apt-postgresql.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap/docs.md#debian-add-apt-postgresqlsh) — Add PostgreSQL APT [repository](https://wiki.postgresql.org/wiki/Apt) with latest packages.
+* [debian-apt-install-devtools.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap/docs.md#debian-apt-install-devtoolssh) — Install [Git](https://git-scm.com), [Task](https://taskfile.dev), [Oh My Zsh!](https://ohmyz.sh), [LSD](https://github.com/lsd-rs/lsd).
+* [debian-pip-install-uv.sh](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap/docs.md#debian-pip-install-uvsh) — Install and configure [uv](https://docs.astral.sh/uv/) with system [pip]() under root.
+
+See [Documentation](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap/docs.md) for details.
 
 Example:
 
 ```Dockerfile
 # Dockerfile
-
 RUN --mount=type=bind,from=dattached/bootstrap,dst=/b \
-    bash /b/debian-apt-install-devtools.sh
+    apt-get update; \
+    bash /b/debian-apt-install-devtools.sh; \
+    apt-get clean; \
+    rm -rf /tmp/* /var/tmp/*
+```
+
+With cached APT directories:
+
+```Dockerfile
+# Dockerfile
+RUN --mount=type=cache,dst=/var/cache/apt,sharing=locked \
+    --mount=type=cache,dst=/var/lib/apt,sharing=locked \
+    --mount=type=bind,from=dattached/bootstrap,dst=/b \
+    apt-get update; \
+    bash /b/debian-apt-install-devtools.sh; \
+    rm -rf /tmp/* /var/tmp/*
 ```
 
 
@@ -36,7 +53,6 @@ Example:
 
 ```yaml
 # compose.yml
-
 services:
   # ...
   lazydocker:
@@ -58,7 +74,6 @@ Example:
 
 ```yaml
 # compose.yml
-
 services:
 
   postgres:
@@ -119,14 +134,12 @@ volumes:
 
 ```yaml
 # config.yaml
-
 connections:
   postgres: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
 ```
 
 ```shell
 # .env
-
 export POSTGRES_PASSWORD=secret
 ```
 
@@ -136,6 +149,7 @@ Install [Task](https://taskfile.dev).
 
 ```shell
 # IMG is one of: bootstrap, lazydocker, usql
+$ task init
 $ task prepare:IMG
 $ task build:IMG
 $ task testrun:IMG
