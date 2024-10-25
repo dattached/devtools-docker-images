@@ -1,0 +1,42 @@
+version: '3'
+
+vars:
+  SHFLAGS_VERSION: 1.3.0  # todo: check that this is latest version
+  DOCS: docs.md
+
+tasks:
+
+  update:
+    cmds:
+      - task: update:docs
+      - task: update:shflags
+
+  update:docs:
+    sources: [scripts/*.sh]
+    cmds:
+      - echo "# Bootstrap scripts" > {{.DOCS}}
+      - task: docs
+        vars: {SCRIPT_PATH: '{{.ITEM}}'}
+        for: sources
+
+  docs:
+    internal: true
+    requires:
+      vars: [SCRIPT_PATH]
+    env:
+      SCRIPT_PATH: '{{.SCRIPT_PATH}}'
+      SCRIPT_NAME: '{{base .SCRIPT_PATH}}'
+      SCRIPT_LIB: 'scripts/lib'
+      SCRIPT_SOURCE: true
+    cmds:
+      - . "{{.SCRIPT_PATH}}" && script_docs >> {{.DOCS}}
+
+  update:shflags:
+    vars:
+      SHFLAGS_URL: https://raw.githubusercontent.com/kward/shflags/v{{.SHFLAGS_VERSION}}/shflags
+      SHFLAGS_PATH: scripts/lib/shflags
+    status:
+      - test -f {{.SHFLAGS_PATH}}
+      - grep -Fxq "FLAGS_VERSION='{{.SHFLAGS_VERSION}}'" {{.SHFLAGS_PATH}}
+    cmds:
+      - wget -q -O {{.SHFLAGS_PATH}} {{.SHFLAGS_URL}}

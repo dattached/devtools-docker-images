@@ -1,0 +1,6 @@
+version: '3'
+
+tasks:
+
+  update:
+    status: [/bin/true]  # todo: check latest versions in Dockerfile
