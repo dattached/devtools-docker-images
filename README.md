@@ -147,12 +147,12 @@ export POSTGRES_PASSWORD=secret
 
 Install [Task](https://taskfile.dev).
 
+For `IMG` one of `bootstrap`, `lazydocker`, `usql`:
+
 ```shell
-# IMG is one of: bootstrap, lazydocker, usql
 $ task init
-$ task prepare:IMG
 $ task build:IMG
 $ task testrun:IMG
-$ task publish:IMG
+$ task release:IMG
 $ task clean
 ```
