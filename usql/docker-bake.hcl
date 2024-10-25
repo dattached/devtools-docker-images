@@ -1,5 +1,5 @@
 variable "name" { default = "usql" }
-variable "version" { default = "0.19.3.1" }  # use Dockerfile USQL_VERSION
+variable "version" { default = "0.19.3.2" }  # use Dockerfile USQL_VERSION
 variable "version_major" { default = join(".", slice(split(".", version), 0, 1)) }
 variable "version_minor" { default = join(".", slice(split(".", version), 0, 2)) }
 variable "version_patch" { default = join(".", slice(split(".", version), 0, 3)) }
