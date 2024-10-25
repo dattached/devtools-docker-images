@@ -54,11 +54,13 @@ Install and configure uv with system pip under root.
 Generates `uv` config:
 ```toml
 # /root/.config/uv/uv.toml
-python_downloads = "never"
-link_mode = "copy"
+compile-bytecode = true
+link-mode = "copy"
+python-downloads = "never"
 [pip]
-require_hashes = true
-verify_hashes = true
+compile-bytecode = true
+require-hashes = true
+verify-hashes = true
 ```
 
 ### Synopsis

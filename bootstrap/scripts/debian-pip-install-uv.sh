@@ -31,11 +31,13 @@ SCRIPT_DOCS_TEMPLATE() {
 
 DEFAULT_UV_CONFIG_PATH="/root/.config/uv/uv.toml"
 DEFAULT_UV_CONFIG=$(cat <<EOF
-python_downloads = "never"
-link_mode = "copy"
+compile-bytecode = true
+link-mode = "copy"
+python-downloads = "never"
 [pip]
-require_hashes = true
-verify_hashes = true
+compile-bytecode = true
+require-hashes = true
+verify-hashes = true
 EOF
 )
 

@@ -1,5 +1,5 @@
 variable "name" { default = "bootstrap" }
-variable "version" { default = "1.4.1" }
+variable "version" { default = "2.0.0" }
 
 # building
 
