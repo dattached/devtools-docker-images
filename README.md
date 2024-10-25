@@ -19,7 +19,7 @@ Managed collection of shell scripts to use in Dockerfiles:
 
 See [Documentation](https://github.com/dattached/devtools-docker-images/blob/main/bootstrap/docs.md) for details.
 
-Example:
+Simple example:
 
 ```Dockerfile
 # Dockerfile
@@ -30,7 +30,7 @@ RUN --mount=type=bind,from=dattached/bootstrap,dst=/b \
     rm -rf /tmp/* /var/tmp/*
 ```
 
-With cached APT directories:
+Example with cached APT directories (preferred):
 
 ```Dockerfile
 # Dockerfile

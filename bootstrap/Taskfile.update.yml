@@ -14,7 +14,11 @@ tasks:
   update:docs:
     sources: [scripts/*.sh]
     cmds:
-      - echo "# Bootstrap scripts" > {{.DOCS}}
+      - echo '# Bootstrap scripts' > {{.DOCS}}
+      - echo >> {{.DOCS}}
+      - cmd: echo '* [{{base .ITEM}}](#{{base .ITEM | replace "." ""}})' >> {{.DOCS}}
+        for: sources
+      - echo >> {{.DOCS}}
       - task: docs
         vars: {SCRIPT_PATH: '{{.ITEM}}'}
         for: sources

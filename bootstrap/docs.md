@@ -1,5 +1,10 @@
 # Bootstrap scripts
 
+* [debian-add-apt-postgresql.sh](#debian-add-apt-postgresqlsh)
+* [debian-apt-install-devtools.sh](#debian-apt-install-devtoolssh)
+* [debian-pip-install-uv.sh](#debian-pip-install-uvsh)
+
+
 ## debian-add-apt-postgresql.sh
 
 Add https://apt.postgresql.org repository with latest PostgreSQL packages.
