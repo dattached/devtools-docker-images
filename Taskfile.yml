@@ -2,7 +2,7 @@ version: '3'
 
 vars:
   ORG: dattached
-  LOCAL: .local
+  LOCAL_DIR: '{{.ROOT_DIR}}/.local'
   # versions
   BOOTSTRAP_VERSION: {sh: sed -ne 's/ARG VERSION=\(.*\)/\1/p' bootstrap/Dockerfile}
   LAZYDOCKER_VERSION: {sh: sed -ne 's/ARG LAZYDOCKER_VERSION=\(.*\)/\1/p' lazydocker/Dockerfile}
@@ -14,9 +14,25 @@ vars:
       "usql" .USQL_VERSION
 
 env:
-  DOCKER_CONFIG: '{{.LOCAL}}/docker'
+  DOCKER_CONFIG: '{{.LOCAL_DIR}}/docker'
 
 tasks:
+
+  # init
+
+  init:
+    desc: Initialize dev environment.
+    cmds:
+      - task: init:homebrew
+
+  init:homebrew:
+    internal: true
+    dir: .dev
+    sources: [.dev/Brewfile]
+    env:
+      HOMEBREW_BUNDLE_NO_LOCK: 1
+    cmds:
+      - brew bundle
 
   # docker
 
@@ -33,89 +49,72 @@ tasks:
     cmds:
       - docker logout
 
-  # prepare
-
-  prepare:*:
-    desc: Prepare dattached/* local prerequisites.
-    vars:
-      IMG: '{{index .MATCH 0}}'
-    cmds:
-      - task: prepare:{{.IMG}}:all
-
-  prepare:bootstrap:all:
-    cmds:
-      - task: prepare:bootstrap:docs
-      - task: prepare:bootstrap:util:shflags
-
-  prepare:bootstrap:docs:
-    sources: [bootstrap/scripts/*.sh]
-    generates: [bootstrap.md]
-    cmds:
-      - echo "# Bootstrap scripts" > bootstrap.md
-      - cmd: >
-          echo -e '\n## {{base .ITEM}}\n```' >> bootstrap.md;
-          bash {{.ITEM}} --help >> bootstrap.md 2>&1 || true;
-          echo '```' >> bootstrap.md;
-        for: sources
-        silent: true
-
-  prepare:bootstrap:util:shflags:
-    vars:
-      SHFLAGS_VERSION: 1.3.0  # todo: check latest version
-      SHFLAGS_URL: https://raw.githubusercontent.com/kward/shflags/v{{.SHFLAGS_VERSION}}/shflags
-      SHFLAGS_PATH: bootstrap/scripts/lib/shflags
-    status:
-      - test -f {{.SHFLAGS_PATH}}
-      - grep -Fxq "FLAGS_VERSION='{{.SHFLAGS_VERSION}}'" {{.SHFLAGS_PATH}}
-    cmds:
-      - wget -q -O {{.SHFLAGS_PATH}} {{.SHFLAGS_URL}}
-
-  prepare:lazydocker:all:
-    status: [/bin/true]  # todo: check latest versions in Dockerfile
-
-  prepare:usql:all:
-    status: [/bin/true]  # todo: check latest versions in Dockerfile
-
   # build
 
   build:*:
-    desc: Build dattached/* docker image.
-    deps: [login, 'prepare:{{.IMG}}']
+    desc: Build dattached/* image.
     vars:
       IMG: '{{index .MATCH 0}}'
-      VERSION: '{{get .VERSIONS .IMG}}'
-      VERSION_MINOR: '{{join "." (slice (splitList "." .VERSION) 0 2)}}'
+    deps: [login]
+    dir: '{{.IMG}}'
+    run: once
     cmds:
-      - docker build
-          --tag {{.ORG}}/{{.IMG}}:{{.VERSION}}
-          --tag {{.ORG}}/{{.IMG}}:{{.VERSION_MINOR}}
-          {{.IMG}}
+      - task -t Taskfile.update.yml update
+      - docker buildx bake
 
   # test run
 
   testrun:*:
-    desc: Run newly built dattached/* image.
+    desc: Test and/or run newly built dattached/* image.
+    vars:
+      IMG: '{{index .MATCH 0}}'
+    cmds:
+      - task: testrun-bake:{{.IMG}}
+      - task: testrun-compose:{{.IMG}}
+
+  testrun-bake:*:
+    internal: true
     vars:
       IMG: '{{index .MATCH 0}}'
     env:
-      COMPOSE_FILE: '{{.IMG}}/test/compose.yml'
+      BUILDKIT_PROGRESS: plain
+    dir: '{{.IMG}}'
+    status:
+      - '! hcl2json docker-bake.hcl | jq -e ".group.test"'
     cmds:
-      - docker compose down  # handle previous failures
-      - docker compose up {{.IMG}}
-      - defer: docker compose down
+      - task: build:{{.IMG}}
+      - docker buildx bake test
 
-  # publish
-
-  publish:*:
-    desc: Publish newly built dattached/* image.
-    deps: ['build:{{.IMG}}']
+  testrun-compose:*:
+    internal: true
     vars:
       IMG: '{{index .MATCH 0}}'
-      VERSION: '{{get .VERSIONS .IMG}}'
-      VERSION_MINOR: '{{join "." (slice (splitList "." .VERSION) 0 2)}}'
+    env:
+      COMPOSE_FILE: '{{.IMG}}/tests/compose.yml'
+    status:
+      - '! test -f ${COMPOSE_FILE}'
     cmds:
-      - docker push "{{.ORG}}/{{.IMG}}:{{.VERSION}}"
-      - docker push "{{.ORG}}/{{.IMG}}:{{.VERSION_MINOR}}"
+      - task: build:{{.IMG}}
+      - docker compose down  # handle previous failures
+      - docker compose up {{.IMG}} --detach
+      - docker compose attach {{.IMG}}
+      - defer: docker compose down
+
+  # release
+
+  release:*:
+    desc: Release newly built dattached/* image.
+    vars:
+      IMG: '{{index .MATCH 0}}'
+      VERSION:
+        sh: hcl2json {{.IMG}}/docker-bake.hcl | jq -r '.variable.version[].default'
+      TARGET: 'dattached/{{.IMG}}:{{.VERSION}}'
+    dir: '{{.IMG}}'
+    status:
+      - 'docker pull {{.TARGET}}'
+    cmds:
+      - git tag -a "{{.TARGET}}" -m "release {{.TARGET}}"
+      - docker buildx bake release
 
   # clean
 
@@ -123,11 +122,4 @@ tasks:
     desc: Cleanup local files.
     cmds:
       - task: logout
-      - rm -rf {{.LOCAL}}
-
-  # helpers
-
-  term:
-    desc: Run dev terminal.
-    cmds:
-      - sh -c 'alacritty --hold --working-directory {{.ROOT_DIR}} -T {{base .ROOT_DIR}} &'
+      - rm -rf {{.LOCAL_DIR}}
